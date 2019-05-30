@@ -22,6 +22,12 @@ chamber! Sadly, it has already been completely emptied by
 earlier adventurers. The only exit is to the south."""),
 }
 
+item = {
+    "gun": Item("gun", "weapon"),
+
+    "knife": Item("knife", "weapon")
+}
+
 
 # Link rooms together
 
@@ -33,6 +39,8 @@ room['overlook'].s_to = room['foyer']
 room['narrow'].w_to = room['foyer']
 room['narrow'].n_to = room['treasure']
 room['treasure'].s_to = room['narrow']
+
+room['outside'].items = [item['gun'], item['knife']]
 
 
 #
@@ -70,7 +78,35 @@ while True:
     second_arg = cmd[-1]
     if first_arg == 'q':
         break
-    elif first_arg == 'move':
+    elif first_arg == 'go':
         player.current_room = try_dir(second_arg[0], player.current_room)
     elif first_arg == 'look':
         print(player.current_room.description)
+    elif first_arg == 'inv':
+        print(player.item_list())
+    elif first_arg == 'seek':
+        items = player.current_room.items
+        if items:
+            for i in items:
+                print(i)
+            inpt = input('>>').lower().split()
+            first_arg = inpt[0]
+            second_arg = inpt[-1]
+            if first_arg[0] == 'q':
+                break
+            elif first_arg == 'grab':
+                for i in items:
+                    if i.name == second_arg:
+                        print(i)
+                        player.items.append(item[i.name])
+                        player.current_room.items.remove(i)
+                        print(f'You grabbed the {i.name}')
+            elif first_arg == 'drop':
+                for i in items:
+                    if i.name == second_arg:
+                        print(i)
+                        player.items.remove(item[i.name])
+                        player.current_room.items.append(i)
+                        print(f'You dropped the {i.name}')
+            else:
+                print('You search the room, yet find nothing of use.')
